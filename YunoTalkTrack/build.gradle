@@ -10,7 +10,7 @@ description = 'project for hackaton yuno 2025'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
