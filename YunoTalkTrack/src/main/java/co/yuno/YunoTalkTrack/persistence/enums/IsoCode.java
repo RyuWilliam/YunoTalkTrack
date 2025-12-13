@@ -17,4 +17,5 @@ public enum IsoCode {
     AU,
     ZA,
     CO,
+    CL
 }

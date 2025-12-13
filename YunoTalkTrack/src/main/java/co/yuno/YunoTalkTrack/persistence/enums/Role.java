@@ -1,8 +1,9 @@
 package co.yuno.YunoTalkTrack.persistence.enums;
 
 public enum Role {
-    SALES,
-    TECH,
-    SUPPORT,
+    PM,
+    TECH_LEAD,
+    OPS,
+    ANALYST,
     ADMIN
 }

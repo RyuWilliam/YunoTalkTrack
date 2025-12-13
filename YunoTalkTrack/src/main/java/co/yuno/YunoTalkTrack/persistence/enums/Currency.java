@@ -13,5 +13,6 @@ public enum Currency {
     RUB,
     AUD,
     ZAR,
+    CLP,
     COP
 }
