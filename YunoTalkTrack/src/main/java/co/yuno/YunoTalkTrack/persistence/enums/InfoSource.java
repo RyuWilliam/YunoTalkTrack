@@ -1,7 +1,0 @@
-package co.yuno.YunoTalkTrack.persistence.enums;
-
-public enum InfoSource {
-    TRANSCRIPT,
-    EMAIL,
-    SLACK
-}

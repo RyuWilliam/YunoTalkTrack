@@ -1,6 +1,5 @@
 package co.yuno.n8nService.persistence.entity;
 
-
 import co.yuno.n8nService.persistence.enums.InfoSource;
 import jakarta.persistence.*;
 
@@ -8,22 +7,41 @@ import java.time.LocalDateTime;
 
 @Entity(name = "raw_table")
 public class RawTable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private InfoSource source;
 
+    @Column(length = 100)
+    private String merchant;
 
-    private String merchent;
-
+    @Column(length = 10000)
     private String snippet;
 
     private LocalDateTime date;
 
-    private String Country;
+    @Column(length = 100)
+    private String country;
+
+    public RawTable() {
+    }
+
+    public RawTable(Integer id, InfoSource source, String merchant, String snippet, LocalDateTime date, String country) {
+        this.id = id;
+        this.source = source;
+        this.merchant = merchant;
+        this.snippet = snippet;
+        this.date = date;
+        this.country = country;
+    }
+    // ELIMINADO: referencia directa a Processed
+    // @ManyToOne
+    // @JoinColumn(name = "processed_id")
+    // private Processed processed;
 
     public Integer getId() {
         return id;
@@ -41,12 +59,12 @@ public class RawTable {
         this.source = source;
     }
 
-    public String getMerchent() {
-        return merchent;
+    public String getMerchant() {
+        return merchant;
     }
 
-    public void setMerchent(String merchent) {
-        this.merchent = merchent;
+    public void setMerchant(String merchant) {
+        this.merchant = merchant;
     }
 
     public String getSnippet() {
@@ -66,10 +84,10 @@ public class RawTable {
     }
 
     public String getCountry() {
-        return Country;
+        return country;
     }
 
     public void setCountry(String country) {
-        Country = country;
+        this.country = country;
     }
 }
