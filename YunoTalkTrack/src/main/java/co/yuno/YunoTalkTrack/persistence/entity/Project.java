@@ -2,7 +2,6 @@
 package co.yuno.YunoTalkTrack.persistence.entity;
 
 import co.yuno.YunoTalkTrack.persistence.enums.Phase;
-import co.yuno.YunoTalkTrack.persistence.enums.ProjectType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,37 +17,25 @@ public class Project {
     private Integer idProject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_merchant", nullable = false)
+    @JoinColumn(name = "id_merchant", nullable = true) // antes nullable = false
     private Merchant merchant;
 
     @Column(length = 100, nullable = false)
     private String name;
 
-    @Column(name = "project_type", nullable = false, length = 50)
-    @Enumerated(EnumType.STRING)
-    private ProjectType projectType;
 
-    @Column(name = "project_phase", nullable = false, length = 50)
+    @Column(name = "project_phase", nullable = true, length = 50) // antes nullable = false
     @Enumerated(EnumType.STRING)
     private Phase projectPhase;
-
-    @ManyToMany
-    @JoinTable(
-            name = "project_responsibles",
-            joinColumns = @JoinColumn(name = "id_project"),
-            inverseJoinColumns = @JoinColumn(name = "id_user")
-    )
-    private List<User> responsibles;
-
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
+    @Column(name = "title", nullable = false, length = 150)
+    private String title;
+
     @Column(name = "go_live_date")
     private LocalDateTime goLiveDate;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
     @OneToMany(
             mappedBy = "project",
@@ -68,14 +55,17 @@ public class Project {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public ProjectType getProjectType() { return projectType; }
-    public void setProjectType(ProjectType projectType) { this.projectType = projectType; }
 
     public Phase getProjectPhase() { return projectPhase; }
     public void setProjectPhase(Phase projectPhase) { this.projectPhase = projectPhase; }
 
-    public List<User> getResponsibles() { return responsibles; }
-    public void setResponsibles(List<User> responsibles) { this.responsibles = responsibles; }
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public LocalDateTime getStartDate() { return startDate; }
     public void setStartDate(LocalDateTime startDate) { this.startDate = startDate; }
@@ -83,8 +73,6 @@ public class Project {
     public LocalDateTime getGoLiveDate() { return goLiveDate; }
     public void setGoLiveDate(LocalDateTime goLiveDate) { this.goLiveDate = goLiveDate; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public List<ProjectInfo> getProjectInfos() { return projectInfos; }
     public void setProjectInfos(List<ProjectInfo> projectInfos) { this.projectInfos = projectInfos; }

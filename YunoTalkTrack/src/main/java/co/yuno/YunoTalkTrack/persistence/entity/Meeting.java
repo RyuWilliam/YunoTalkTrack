@@ -1,7 +1,7 @@
 // Java
 package co.yuno.YunoTalkTrack.persistence.entity;
 
-import co.yuno.YunoTalkTrack.persistence.enums.MeetingType;
+import co.yuno.YunoTalkTrack.persistence.enums.InfoSource;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -20,9 +20,9 @@ public class Meeting {
     @Column(name = "id_meeting")
     private Integer id;
 
+    @Column(name = "info_source", nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
-    @Column(name = "meeting_type", nullable = false, length = 30)
-    private MeetingType meetingType;
+    private InfoSource infoSource;
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
@@ -45,18 +45,23 @@ public class Meeting {
     @Column(name = "summary", length = 2000)
     private String summary;
 
-    // Uno a uno con ProjectInfo, lado dueño
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_info_proyecto", unique = true)
     private ProjectInfo projectInfo;
 
     public Meeting() {}
 
+    public InfoSource getInfoSource() {
+        return infoSource;
+    }
+
+    public void setInfoSource(InfoSource infoSource) {
+        this.infoSource = infoSource;
+    }
+
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
-    public MeetingType getMeetingType() { return meetingType; }
-    public void setMeetingType(MeetingType meetingType) { this.meetingType = meetingType; }
 
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }

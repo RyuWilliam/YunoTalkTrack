@@ -51,6 +51,7 @@ public class Merchant {
     public String getIndustry() { return industry; }
     public void setIndustry(String industry) { this.industry = industry; }
 
+
     public List<CountryMerchant> getCountryMerchants() { return countryMerchants; }
     public void setCountryMerchants(List<CountryMerchant> countryMerchants) { this.countryMerchants = countryMerchants; }
 }
