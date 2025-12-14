@@ -1,0 +1,1578 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ],
+          "q": "(subject:\"Zoop\" OR subject:\"Zoop -\" OR subject:\"Uder\" OR subject:\"Uder -\" OR subject:\"Nestflis\" OR subject:\"Nestflis -\" OR subject:\"idid\" OR subject:\"idid -\")",
+          "readStatus": "both"
+        }
+      },
+      "id": "6a73c559-4f3a-4e98-8fe4-fb03d5efc686",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        1232
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "DLMUafcszawRYGKG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "92704ebe-c5b6-419e-93ec-40f38d855013",
+              "name": "source",
+              "value": "EMAIL",
+              "type": "string"
+            },
+            {
+              "id": "8fabcb40-2c6f-4379-9c46-33ef31490ea4",
+              "name": "merchant",
+              "value": "={{ (($json[\"Subject\"] || $json.subject || '') + '').trim().split('-')[0].toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "b4bf7d5a-e9ae-43bd-a6a8-c0716f1028c1",
+              "name": "snippet",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "5706ec96-c82b-4eaa-92e3-627a05655d5c",
+              "name": "date",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "53926402-08c5-4e78-bd73-bfbf73b32704",
+              "name": "country",
+              "value": "={{ (($json[\"Subject\"] || $json.subject || '') + '').trim().split('-')[1].toUpperCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1fe3c016-3c76-4eb5-8a43-f6759c52efc4",
+      "name": "Normalize Email Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2416,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "source",
+              "value": "SLACK",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "=merchant",
+              "value": "={{ ((($json.text || '') + '').replace(/\\\\n/g, '\\n').split('\\n')[0].split('-')[0] || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "snippet",
+              "value": "={{ ((($json.text || '') + '').replace(/\\\\n/g, '\\n').split('\\n').slice(1).join('\\n').trim())}}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "date",
+              "value": "={{ new Date().toISOString().trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "175359e3-e613-4c02-9f40-c12bfc96f3d5",
+              "name": "country",
+              "value": "={{ ((($json.text || '') + '').replace(/\\\\n/g, '\\n').split('\\n')[0].split('-')[1] || '').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d7b65fc1-b7b3-44bb-9db5-e6b007bd5dda",
+      "name": "Normalize Slack Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2416,
+        1440
+      ],
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "source",
+              "value": "TRANSCRIPT",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "merchant",
+              "value": "={{ ((($node[\"Extract from File\"].json.data || '') + '')\n  .replace(/\\\\n/g, '\\n')\n  .split('\\n')[0]\n  .split('-')[0]\n  .trim()\n) }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "snippet",
+              "value": "={{ ((($node[\"Extract from File\"].json.data || '') + '')\n  .replace(/\\\\n/g, '\\n')\n  .split('\\n')\n  .slice(1)\n  .join('\\n')\n  .trim()\n) }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "date",
+              "value": "={{ $node[\"Gmail Trigger1\"].json.internalDate ? new Date(parseInt($node[\"Gmail Trigger1\"].json.internalDate,10)).toISOString() : new Date().toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "24ddb452-fefd-455b-94ff-71f269c7355a",
+              "name": "country",
+              "value": "={{ ((($node[\"Extract from File\"].json.data || '') + '')   .replace(/\\\\n/g, '\\n')   .split('\\n')[0]   .split('-')[1]   .trim() ) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "daba830d-09fc-4439-bdfc-6eae6f8ec4eb",
+      "name": "Normalize Transcript Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2416,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "message"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C0A3EKU5DLJ",
+          "mode": "list",
+          "cachedResultName": "zoop"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        1440
+      ],
+      "id": "2c25b157-ef31-4252-b7ac-029ba6477ff5",
+      "name": "Slack Trigger",
+      "webhookId": "51fd5c7c-d6f4-4fbd-bd68-00fdd784ba8b",
+      "credentials": {
+        "slackApi": {
+          "id": "pHbnm6QwfChERd8G",
+          "name": "Slack account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ],
+          "q": "has:attachment (subject:\"gong\" OR subject:\"gong-\")",
+          "readStatus": "both"
+        }
+      },
+      "id": "dc6c3a82-b970-4d47-9f67-346e6fbc0300",
+      "name": "Gmail Trigger1",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        1056
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "DLMUafcszawRYGKG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1968,
+        1056
+      ],
+      "id": "701bdf37-ee65-4fc1-a4f6-c44f0ea27936",
+      "name": "Get a message",
+      "webhookId": "e390230c-1694-473b-b340-fff4966c89a3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "DLMUafcszawRYGKG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2192,
+        1056
+      ],
+      "id": "9064cd94-2532-41bd-9cd3-7d953f8c0522",
+      "name": "Extract from File",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "6905f8d5-664f-4ba3-a282-e3d0eead1e5a",
+      "name": "Merge All Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2640,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Eres un normalizador para guardar memoria de merchants en una sola fila.\n\nTu respuesta debe ser SOLO JSON válido, sin markdown, sin texto adicional.\n\nOBJETIVO:\n\nGenerar UN SOLO objeto JSON.\n\nAsignar UNA SOLA phase para TODO el objeto (no mezclar fases dentro del mismo output).\n\nExtraer información del snippet y clasificarla por categorías.\n\nREGLAS OBLIGATORIAS:\n\nNO inventes información. Usa únicamente datos explícitos del snippet y metadatos del input.\n\nDevuelve UN SOLO objeto JSON con EXACTAMENTE estas llaves:\nprojectName, phase, source, merchant, occurred_at, country, comercial, pagos, tecnico, legal, riesgos\n\nsource = input.source exacto.\n\noccurred_at = input.date exacto (no modificar zona horaria ni formato).\n\ncountry = input.country exacto.\n\nmerchant:\n\nSi el snippet menciona explícitamente un merchant/nombre/dominio, úsalo.\n\nSi no, usa input.merchant limpiando espacios y saltos de línea.\n\nSi no hay, null.\n\nprojectName = merchant (si merchant es null, projectName null).\n\nPHASE (UNA SOLA PARA TODO EL OBJETO):\n8) phase ∈ {SALES, INTEGRATION, SUPPORT, LIVE} Tienen que ser asi en mayusculas\n9) Decide phase SOLO con keywords en el snippet, usando esta PRIORIDAD:\nLIVE > SUPPORT > INTEGRATION > SALES\n10) KEYWORDS:\n\nSALES: precio, cotización, demo, plan, licencia, contrato, propuesta, pagar, factura\n\nINTEGRATION: API, webhook, endpoint, token, OAuth, JSON, payload, integración, SDK, credenciales, staging, provider, sandbox\n\nSUPPORT: error, problema, no funciona, bug, ayuda, issue, falla, excepción\n\nLIVE: caído, incidente, urgente, SLA, impacto, outage, down\n\nRegla especial anti-error:\n\nLa palabra “producción” o “go-live” NO implica phase live.\n\nSolo usar phase live si hay incidente/outage/caído/impacto/SLA/urgente.\n\nCATEGORÍAS (opcional):\n12) Cada categoría (comercial, pagos, tecnico, legal, riesgos) debe ser:\n\nnull si no hay evidencia clara en el snippet\n\no { \"summary\": \"string\", \"detail\": \"string bullets\" }\n\nsummary:\n\nMáximo 180 caracteres\n\nDebe resumir lo principal de esa categoría\n\ndetail:\n\nBullets con \"- \" por línea\n\nMáximo 6 bullets por categoría\n\nNO copiar el snippet completo\n\nNO repetir el mismo punto en varias categorías; usa solo la categoría más adecuada\n\nCATEGORIZACIÓN EXACTA:\n\ncomercial: volumen, ticket, fechas go-live, fee, próximos pasos de negocio, expectativas\n\npagos: providers, métodos de pago, 3DS, refunds, tokenización, wallets\n\ntecnico: SDK, webhooks, endpoints, credenciales, OAuth/tokens, payload/JSON técnico, staging\n\nlegal: contrato, términos, KYC/AML/compliance, restricciones regulatorias\n\nriesgos: bloqueos, dependencias, condiciones para avanzar, impactos si no se resuelve algo\n\nSi en el snippet NO hay evidencia técnica (SDK, API, webhooks, endpoints, credenciales, OAuth/tokens, payload/JSON, staging/sandbox), entonces \"tecnico\": null. PROHIBIDO escribir un objeto técnico con texto genérico.\n\nEstá prohibido inferir “pendiente configurar”, “falta hacer”, “revisar”, “agendar”, “bloqueo técnico” si el snippet no lo menciona explícitamente.\n\nNunca devuelvas categorías vacías. Si no hay bullets concretos, devuelve null.\n",
+              "role": "=model"
+            },
+            {
+              "content": "=Procesa el siguiente INPUT JSON y devuelve SOLO el objeto JSON final cumpliendo todas las reglas.\n\nINPUT:\n{{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3344,
+        1248
+      ],
+      "id": "acaa01e4-abc5-43c3-ad88-cb2a1252c67a",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Hgfa8HzuJuPEKLok",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "raw_table",
+          "mode": "list",
+          "cachedResultName": "raw_table"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "snippet": "={{ $json.snippet }}",
+            "date": "={{ $json.date }}",
+            "country": "={{ $json.country }}",
+            "source": "={{ $json.source }}",
+            "merchant": "={{ $json.merchant }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "merchant",
+              "displayName": "merchant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "snippet",
+              "displayName": "snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3120,
+        1248
+      ],
+      "id": "f32d34ca-c5fa-46d0-a738-3de2040ad645",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5320ed24-957e-4215-8e66-bcf8391861b2",
+              "name": "phase",
+              "value": "=INTEGRATION",
+              "type": "string"
+            },
+            {
+              "id": "2e8f33ff-4570-4c7b-bace-34c7702a6dba",
+              "name": "merchant",
+              "value": "={{ $('Insert rows in a table').item.json.merchant }}",
+              "type": "string"
+            },
+            {
+              "id": "2bbd0030-3e8c-4ba7-86c9-c84755d03a1e",
+              "name": "fecha_act",
+              "value": "={{ $('Insert rows in a table').item.json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "5c721bfb-520f-40a6-8ccb-3d783c6bf288",
+              "name": "country",
+              "value": "={{ $('Insert rows in a table').item.json.country }}",
+              "type": "string"
+            },
+            {
+              "id": "a76257ea-52c8-458b-9796-77d238b475ab",
+              "name": "comercial",
+              "value": "={{ JSON.parse($json.content.parts[0].text).comercial?.summary || null }}",
+              "type": "string"
+            },
+            {
+              "id": "fc2dbb7f-8f9e-4909-9285-e7fd12098555",
+              "name": "pagos",
+              "value": "={{ JSON.parse($json.content.parts[0].text).pagos?.summary || null }}",
+              "type": "string"
+            },
+            {
+              "id": "75d138be-bb38-4a90-ad2f-f68397c702a9",
+              "name": "tecnico",
+              "value": "={{ JSON.parse($json.content.parts[0].text).tecnico?.summary || null }}",
+              "type": "string"
+            },
+            {
+              "id": "dab6c7be-270f-4c5a-8046-3e396f6a680c",
+              "name": "legal",
+              "value": "={{ JSON.parse($json.content.parts[0].text).legal?.summary || null }}",
+              "type": "string"
+            },
+            {
+              "id": "ba80fa32-7a59-4298-9cda-9c20e473d7b0",
+              "name": "riesgo",
+              "value": "={{ JSON.parse($json.content.parts[0].text).riesgos?.summary || null }}",
+              "type": "string"
+            },
+            {
+              "id": "b097202e-41a5-4156-bc95-951d8a4872b7",
+              "name": "id_Crudo",
+              "value": "={{ $('Insert rows in a table').item.json.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f3e8d617-85d3-4ba6-8fdc-4171493b6637",
+      "name": "Normalize Email Data1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3696,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM processed WHERE merchant LIKE '{{ $json.merchant}}' AND country like '{{ $json.country }}'",
+        "options": {
+          "queryReplacement": "={{ $json.merchant }},{{$json.country}}"
+        }
+      },
+      "id": "7c21cff5-aa06-4f7b-aa28-9fbcd810ccee",
+      "name": "Query Procesed Table",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3920,
+        1248
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ ($items(\"Query Procesed Table\").length > 0).toString() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "id": "3e55b318-6aa0-495d-a255-ad59787b8a47",
+      "name": "Check if Record Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4144,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "procesed"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phase": "={{ $('Normalize Email Data1').item.json.phase }}",
+            "legal": "={{ $('Normalize Email Data1').item.json.legal }}",
+            "id_procesed": 0
+          },
+          "matchingColumns": [
+            "merchant"
+          ],
+          "schema": [
+            {
+              "id": "id_procesed",
+              "displayName": "id_procesed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phase",
+              "displayName": "phase",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "project_name",
+              "displayName": "project_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payment",
+              "displayName": "payment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "risk",
+              "displayName": "risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "legal",
+              "displayName": "legal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "technical",
+              "displayName": "technical",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "commercial",
+              "displayName": "commercial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "detail",
+              "displayName": "detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5dde1f3-bd28-4fd0-a41a-1ee30362dd74",
+      "name": "Update Procesed Record",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5424,
+        976
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "processed",
+          "mode": "list",
+          "cachedResultName": "processed"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "merchant": "={{ $('Normalize Email Data1').item.json.merchant }}",
+            "country": "={{ $('Normalize Email Data1').item.json.country }}",
+            "phase": "={{ $('Normalize Email Data1').item.json.phase }}",
+            "payment": "={{ $('Normalize Email Data1').item.json.pagos }}",
+            "risk": "={{ $('Normalize Email Data1').item.json.riesgo }}",
+            "legal": "={{ $('Normalize Email Data1').item.json.legal }}",
+            "technical": "={{ $('Normalize Email Data1').item.json.tecnico }}",
+            "commercial": "={{ $('Normalize Email Data1').item.json.comercial }}",
+            "last_updated": "={{ $('Normalize Email Data1').item.json.fecha_act }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_processed",
+              "displayName": "id_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "merchant",
+              "displayName": "merchant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phase",
+              "displayName": "phase",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "project_name",
+              "displayName": "project_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "payment",
+              "displayName": "payment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risk",
+              "displayName": "risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "legal",
+              "displayName": "legal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "technical",
+              "displayName": "technical",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "commercial",
+              "displayName": "commercial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_updated",
+              "displayName": "last_updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e306fab3-bbc4-467a-8e6a-5996026d396a",
+      "name": "Insert Procesed Record",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4368,
+        1344
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2112,
+        1216
+      ],
+      "id": "b4218bc9-9a5e-4c04-b81c-af1fa13b1820",
+      "name": "Get a message1",
+      "webhookId": "e390230c-1694-473b-b340-fff4966c89a3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "DLMUafcszawRYGKG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "processed_raw",
+          "mode": "list",
+          "cachedResultName": "processed_raw"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processed_id": "={{ $json.id_processed }}",
+            "raw_id": "={{ $('Insert rows in a table').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processed_id",
+              "displayName": "processed_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "raw_id",
+              "displayName": "raw_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "77b6f1c7-bbf6-4c66-8e96-eb818c909173",
+      "name": "Insert Procesed Record1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4704,
+        1360
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{\n  (\n    $items(\"Check if Record Exists\")[0]?.json?.phase\n    || ''\n  ).toString().trim().toUpperCase()\n}}",
+              "rightValue": "={{   (     $items(\"Normalize Email Data1\")[0]?.json?.phase     || ''   ).toString().trim().toUpperCase() }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "id": "f3ddb9a6-71e4-4157-bb5b-7b3b28dffca6",
+      "name": "Check if Record Exists1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4384,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "processed",
+          "mode": "list",
+          "cachedResultName": "processed"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "merchant": "={{ $('Normalize Email Data1').item.json.merchant }}",
+            "country": "={{ $('Normalize Email Data1').item.json.country }}",
+            "phase": "={{ $('Normalize Email Data1').item.json.phase }}",
+            "payment": "={{ $('Normalize Email Data1').item.json.pagos }}",
+            "risk": "={{ $('Normalize Email Data1').item.json.riesgo }}",
+            "legal": "={{ $('Normalize Email Data1').item.json.legal }}",
+            "technical": "={{ $('Normalize Email Data1').item.json.tecnico }}",
+            "commercial": "={{ $('Normalize Email Data1').item.json.comercial }}",
+            "last_updated": "={{ $('Normalize Email Data1').item.json.fecha_act }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_processed",
+              "displayName": "id_processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "merchant",
+              "displayName": "merchant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phase",
+              "displayName": "phase",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "project_name",
+              "displayName": "project_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "payment",
+              "displayName": "payment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risk",
+              "displayName": "risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "legal",
+              "displayName": "legal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "technical",
+              "displayName": "technical",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "commercial",
+              "displayName": "commercial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_updated",
+              "displayName": "last_updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9ab2bf9f-72aa-48e5-990a-dc63467074a9",
+      "name": "Insert Procesed Record2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4640,
+        1200
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "processed_raw",
+          "mode": "list",
+          "cachedResultName": "processed_raw"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processed_id": "={{ $json.id_processed }}",
+            "raw_id": "={{ $('Insert rows in a table').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "processed_id",
+              "displayName": "processed_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "raw_id",
+              "displayName": "raw_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9ab004df-df0b-49cb-8591-569b8316f778",
+      "name": "Insert Procesed Record3",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4976,
+        1216
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "i40q0ZCykC5k2ss1",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5320ed24-957e-4215-8e66-bcf8391861b2",
+              "name": "ai_obj",
+              "value": "={{ JSON.parse(($json.ai || '').trim()) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "49719b64-7d48-483d-9133-f49ec33172db",
+      "name": "Normalize Email Data2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5184,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "La salida debera ser asi solo 1\n\n{\n  \"decision\": \"conflict\",\n  \"phase\": \"INTEGRATION\",\n  \"fields_to_update\": {\n    \"commercial\": \"(conflicted)\\nExisting (current): idid planea salir en producción en US el 15 de enero, con un volumen estimado de 45k transacciones/día. El fee negociado es 2.9% + USD 0.30 (US) y el go-live está condicionado a pruebas de chargeback.\\nIncoming (new): El merchant idid confirmó su intención de salir en producción en US el 28 de enero.\\nAction required: Choose which one is correct.\",\n    \"payment\": null,\n    \"technical\": null,\n    \"risk\": null,\n    \"legal\": null\n  },\n  \"conflicted_fields\": [\"commercial\"],\n  \"summary\": \"Conflict detected in commercial; user choice required.\"\n}\n",
+              "role": "=model"
+            },
+            {
+              "content": "=You are reconciling TWO JSON objects related to the same merchant and phase:\n- existing_record (source of truth)\n- new_record (incoming)\n\nABSOLUTE RULES:\n1) Do NOT invent or fabricate any value. Every non-null string you output MUST be copied verbatim from either existing_record or new_record.\n2) Do NOT create placeholders like \"contact@new.com\", \"engineer_B\", or generic phrases not present in input.\n3) Only evaluate and output these canonical fields:\n   - commercial\n   - payment\n   - technical\n   - risk\n   - legal\n4) If the new value for a field is null/empty, ignore it (do not update that field).\n5) Normalize phase by trimming, uppercasing, and removing a trailing \"S\" (so INTEGRATION == INTEGRATIONS).\n\nFIELD MAPPING (synonyms):\n- commercial <= new_record.comercial OR new_record.commercial\n- payment    <= new_record.pagos OR new_record.payment\n- technical  <= new_record.tecnico OR new_record.technical\n- risk       <= new_record.riesgo OR new_record.risk\n- legal      <= new_record.legal\n\nCOMPARISON LOGIC (per field):\n- Let existing_value be existing_record[field] (string or null).\n- Let incoming_value be mapped new_record value (string or null).\n- If incoming_value is null/empty -> fields_to_update[field] = null.\n- Else if existing_value is null/empty -> fields_to_update[field] = incoming_value (verbatim).\n- Else both have content:\n   A) If they are compatible or additive (no contradiction) -> fields_to_update[field] = incoming_value (verbatim).\n   B) If they contradict each other -> mark conflict for that field and set fields_to_update[field] to a conflict block that shows BOTH values.\n\nCONFLICT BLOCK FORMAT (MUST be exactly this, using only verbatim input text):\n\"(conflicted)\\nExisting (current): <existing_value>\\nIncoming (new): <incoming_value>\\nAction required: Choose which one is correct.\"\n\nIMPORTANT:\n- In a conflict block, you must include BOTH existing_value and incoming_value exactly as-is.\n- Do not merge, rewrite, summarize, or “fix” the content.\n- If you are unsure whether it is a contradiction, do NOT mark conflict; prefer update only when clearly safe.\n\nFINAL DECISION:\n- If any conflicted field exists -> decision = \"conflict\"\n- Else if any field_to_update has a non-null value -> decision = \"update\"\n- Else -> decision = \"no_change\"\n\nOUTPUT:\nReturn ONLY valid JSON (no markdown, no extra text) with this structure:\n\n{\n  \"decision\": \"no_change|update|conflict\",\n  \"phase\": \"<normalized_phase>\",\n  \"fields_to_update\": {\n    \"commercial\": null|string,\n    \"payment\": null|string,\n    \"technical\": null|string,\n    \"risk\": null|string,\n    \"legal\": null|string\n  },\n  \"conflicted_fields\": [],\n  \"summary\": \"One short sentence describing what changed, referencing only the fields detected.\"\n}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        4640,
+        1024
+      ],
+      "id": "ec6eb220-6204-4f60-8fec-4753e6779e56",
+      "name": "Message a model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Hgfa8HzuJuPEKLok",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ (() => {\n  const o = JSON.parse(($json.ai || '').trim());\n  return {\n    decision: o.decision,\n    phase: o.phase,\n    commercial: o.fields_to_update?.commercial ?? null,\n    payment: o.fields_to_update?.payment ?? null,\n    technical: o.fields_to_update?.technical ?? null,\n    risk: o.fields_to_update?.risk ?? null,\n    legal: o.fields_to_update?.legal ?? null,\n    conflicted_fields: o.conflicted_fields ?? [],\n    summary: o.summary ?? null,\n    has_conflict: (o.conflicted_fields || []).length > 0,\n    last_updated: $now.toISOString()\n  };\n})() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4976,
+        960
+      ],
+      "id": "e0ac7555-c602-42b2-85c6-e5cfb74f4d71",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Email Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Slack Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Normalize Transcript Data": {
+      "main": [
+        [
+          {
+            "node": "Merge All Sources",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Slack Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Normalize Transcript Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge All Sources": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Normalize Email Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Email Data1": {
+      "main": [
+        [
+          {
+            "node": "Query Procesed Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Procesed Table": {
+      "main": [
+        [
+          {
+            "node": "Check if Record Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Record Exists": {
+      "main": [
+        [
+          {
+            "node": "Check if Record Exists1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert Procesed Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message1": {
+      "main": [
+        [
+          {
+            "node": "Normalize Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Procesed Record": {
+      "main": [
+        [
+          {
+            "node": "Insert Procesed Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Record Exists1": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert Procesed Record2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Procesed Record2": {
+      "main": [
+        [
+          {
+            "node": "Insert Procesed Record3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Email Data2": {
+      "main": [
+        [
+          {
+            "node": "Update Procesed Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Normalize Email Data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "808aaa0d-f259-49e5-bc8c-c40c5b80eb1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77c3f13c19985f1f9d41de59a519c8b25247cf54ce95e0e544354a7fb0098a61"
+  },
+  "id": "Y9v875HHMwNLATWu",
+  "tags": []
+}
